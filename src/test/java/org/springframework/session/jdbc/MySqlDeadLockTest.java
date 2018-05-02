@@ -108,41 +108,4 @@ public class MySqlDeadLockTest {
         pool.shutdown();
         pool.awaitTermination(10, TimeUnit.MINUTES);
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        ExecutorService pool = Executors.newFixedThreadPool(2);
-        LinkedBlockingQueue<Object> deletes = new LinkedBlockingQueue<>(100);
-        pool.submit(() -> {
-            for (int j = 0; j < STEPS; j++) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("Inserted step " + j);
-                try {
-                    deletes.put(new Object());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
-
-        pool.submit(() -> {
-            for (int j = 0; j < STEPS; j++) {
-                try {
-                    deletes.take();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("Deleted step " + j);
-            }
-        });
-
-        pool.shutdown();
-        pool.awaitTermination(10, TimeUnit.MINUTES);
-    }
-
-
 }
